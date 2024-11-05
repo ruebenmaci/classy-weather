@@ -33,22 +33,19 @@ function formatDay(dateStr) {
 }
 
 class App extends React.Component {
-  state = {
-    location: "",
-    isLoading: false,
-    displayLocation: "",
-    weather: {},
-  };
-
-  /*constructor(props) {
+  constructor(props) {
     super(props);
-    //this.fetchWeather = this.fetchWeather.bind(this);
-  }*/
 
-  //async fetchWeather() {
-  fetchWeather = async () => {
-    if (this.state.location.length < 2) return this.setState({ weather: {} });
+    this.state = {
+      location: "lisbon",
+      isLoading: false,
+      displayLocation: "",
+      weather: {},
+    };
+    this.fetchWeather = this.fetchWeather.bind(this);
+  }
 
+  async fetchWeather() {
     try {
       this.setState({ isLoading: true });
 
@@ -78,23 +75,6 @@ class App extends React.Component {
     } finally {
       this.setState({ isLoading: false });
     }
-  };
-
-  setLocation = (e) => this.setState({ location: e.target.value });
-
-  // called immediately after rendering same as useEffect with []
-  componentDidMount() {
-    //this.fetchWeather();
-    this.setState({ location: localStorage.getItem("location") || "" });
-  }
-  // React gives it access to the previous state and the previous props
-  // same as useEffect with [location]
-  componentDidUpdate(prevProps, prevState) {
-    if (this.state.location !== prevState.location) {
-      this.fetchWeather();
-
-      localStorage.setItem("location", this.state.location);
-    }
   }
 
   render() {
@@ -102,11 +82,14 @@ class App extends React.Component {
       <div className="app">
         <h1>Classy Weather</h1>
         <div>
-          <Input
-            location={this.state.location}
-            onChangeLocation={this.setLocation}
+          <input
+            type="text"
+            placeholder="Search for location..."
+            value={this.state.location}
+            onChange={(e) => this.setState({ location: e.target.value })}
           />
         </div>
+        <button onClick={this.fetchWeather}>Get weather</button>
 
         {this.state.isLoading && <p className="loader">Loading...</p>}
 
@@ -123,30 +106,9 @@ class App extends React.Component {
 
 export default App;
 
-class Input extends React.Component {
-  render() {
-    return (
-      <input
-        type="text"
-        placeholder="Search for location..."
-        value={this.props.location}
-        // now using child to parent communication and it is just as
-        // import in class based components as it is in function
-        // based components
-        onChange={this.props.onChangeLocation}
-      />
-    );
-  }
-}
-
 // when you don't need state and you don't need to explicitely bind the
 // this keyword you don't need a constructor method!
 class Weather extends React.Component {
-  // when there is no string there is no weather
-  componentWillUnmount() {
-    console.log("Weather is unmounting");
-  }
-
   render() {
     const {
       temperature_2m_max: max,
